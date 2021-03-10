@@ -51,8 +51,8 @@ private:
         return std::sqrt(ss / vsize - s * s);
 #else
         double mean = v.mean();
-        // Vector v_centered = v.array() - mean; // Original oem version, where centering and scaling are performed when standardize = TRUE
-        Vector v_centered = v.array() - 0; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+        Vector v_centered = v.array() - mean; // Original oem version, where centering and scaling are performed when standardize = TRUE
+        //Vector v_centered = v.array() - 0; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
 
         return v_centered.norm() / std::sqrt(double(v.size()));
 #endif
@@ -103,12 +103,12 @@ public:
             case 1:
                 if (wt_len)
                 {
-                    scaleY = sd_n( (Y.array() * wts.array().sqrt()).matrix() );
-                    //scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
+                    //scaleY = sd_n( (Y.array() * wts.array().sqrt()).matrix() );
+                    scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 } else 
                 {
-                    scaleY = sd_n(Y);
-                    //scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
+                    //scaleY = sd_n(Y);
+                    scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 }
                 Y.array() /= scaleY; 
                 //Y.array() /= 1; // EDIT (grplasso): no centering/scaling of Y
