@@ -103,12 +103,12 @@ public:
             case 1:
                 if (wt_len)
                 {
-                    //scaleY = sd_n( (Y.array() * wts.array().sqrt()).matrix() );
-                    scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
+                    scaleY = sd_n( (Y.array() * wts.array().sqrt()).matrix() );
+                    //scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 } else 
                 {
-                    //scaleY = sd_n(Y);
-                    scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
+                    scaleY = sd_n(Y);
+                    //scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 }
                 Y.array() /= scaleY; 
                 //Y.array() /= 1; // EDIT (grplasso): no centering/scaling of Y
