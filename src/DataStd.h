@@ -51,10 +51,11 @@ private:
         return std::sqrt(ss / vsize - s * s);
 #else
         double mean = v.mean();
-        Vector v_centered = v.array() - mean; // Original oem version, where centering and scaling are performed when standardize = TRUE
-        //Vector v_centered = v.array() - 0; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+        //Vector v_centered = v.array() - mean; // Original oem version, where centering and scaling are performed when standardize = TRUE
+        Vector v_centered = v.array(); // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
 
-        return v_centered.norm() / std::sqrt(double(v.size()));
+        //return v_centered.norm() / std::sqrt(double(v.size()));
+        return v_centered.norm();// / std::sqrt(double(v.size()));
 #endif
     }
 
