@@ -50,12 +50,11 @@ private:
         s /= vsize;
         return std::sqrt(ss / vsize - s * s);
 #else
-        double mean = v.mean();
+        //double mean = v.mean();
         //Vector v_centered = v.array() - mean; // Original oem version, where centering and scaling are performed when standardize = TRUE
         Vector v_centered = v.array(); // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
 
-        //return v_centered.norm() / std::sqrt(double(v.size()));
-        return v_centered.norm();// / std::sqrt(double(v.size()));
+        return v_centered.norm() / std::sqrt(double(v.size()));
 #endif
     }
 
@@ -194,7 +193,7 @@ public:
                     {
                         scaleX[i] = 1.0;
                     }
-                    standardize_vec_avx<double>(begin, n, meanX[i], 1.0 / scaleX[i]);
+                    standardize_vec_avx<double>(begin, n, 0*meanX[i], 1.0 / scaleX[i]);
 #else
                     // double *begin = &X(0, i);
                     // double *end = begin + n;
@@ -253,7 +252,7 @@ public:
                         {
                             scaleX[i] = 1.0;
                         }
-                        standardize_vec_avx<double>(begin, n, meanX[i], 1.0 / scaleX[i]);
+                        standardize_vec_avx<double>(begin, n, 0*meanX[i], 1.0 / scaleX[i]);
         #else
                         // double *begin = &X(0, i);
                         // double *end = begin + n;
