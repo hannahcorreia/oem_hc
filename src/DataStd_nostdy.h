@@ -25,12 +25,12 @@ private:
 
     // flag - 0: standardize = FALSE, intercept = FALSE
     //             directly fit model
-    // flag - 1: standardize = TRUE, intercept = FALSE
-    //             scale x and y by their standard deviation // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+    // flag - 1: standardize = TRUE, intercept = FALSE //This is the case we want, BUT standardize IS NOT BLOCKWISE HERE (grplasso IS blockwise)!!
+    //             scale x and y by their standard deviation // EDIT: no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
     // flag - 2: standardize = FALSE, intercept = TRUE
-    //             center x, standardize y // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+    //             center x, standardize y 
     // flag - 3: standardize = TRUE, intercept = TRUE
-    //             standardize x and y // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+    //             standardize x and y 
     const int flag;
 
     const int n;
@@ -50,7 +50,7 @@ private:
         s /= vsize;
         return std::sqrt(ss / vsize - s * s);
 #else
-        //double mean = v.mean();
+        double mean = v.mean();
         //Vector v_centered = v.array() - mean; // Original oem version, where centering and scaling are performed when standardize = TRUE
         Vector v_centered = v.array(); // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
 
@@ -110,38 +110,40 @@ public:
                     //scaleY = sd_n(Y);
                     scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 }
+                
                 Y.array() /= scaleY; 
-                //Y.array() /= 1; // EDIT (grplasso): no centering/scaling of Y
+                
                 break;
             case 2:
                 if (wt_len)
                 {
                     meanY = (Y.array() * wts.array().sqrt()).matrix().mean();
+                    //Y.array() -= meanY; // Original oem
                     Y.array() -= 0*meanY; 
-                    //scaleY = (Y.array() * wts.array()).matrix().norm() * n_invsqrt; 
+                    //scaleY = (Y.array() * wts.array()).matrix().norm() * n_invsqrt; // Original oem
                     scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 } else
                 {
                     meanY = Y.mean();
-                    //Y.array() -= meanY; // EDIT (grplasso): no centering/scaling of Y
+                    //Y.array() -= meanY; // Original oem
                     Y.array() -= 0*meanY; // EDIT (grplasso): no centering/scaling of Y
-                    //scaleY = Y.norm() * n_invsqrt;
+                    //scaleY = Y.norm() * n_invsqrt; // Original oem
                     scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 }
             case 3:
                 if (wt_len)
                 {
                     meanY = (Y.array() * wts.array().sqrt()).matrix().mean();
-                    //Y.array() -= meanY; // EDIT (grplasso): no centering/scaling of Y
+                    //Y.array() -= meanY; // Original oem
                     Y.array() -= 0*meanY; // EDIT (grplasso): no centering/scaling of Y
-                    //scaleY = (Y.array() * wts.array().sqrt()).matrix().norm() * n_invsqrt;
+                    //scaleY = (Y.array() * wts.array().sqrt()).matrix().norm() * n_invsqrt; // Original oem
                     scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 } else
                 {
                     meanY = Y.mean();
-                    //Y.array() -= meanY; // EDIT (grplasso): no centering/scaling of Y
+                    //Y.array() -= meanY; // Original oem
                     Y.array() -= 0*meanY; // EDIT (grplasso): no centering/scaling of Y
-                    //scaleY = Y.norm() * n_invsqrt;
+                    //scaleY = Y.norm() * n_invsqrt; // Original oem
                     scaleY = 1; // EDIT (grplasso): no centering/scaling of Y
                 }
                 
@@ -172,7 +174,7 @@ public:
                 for(int i = 0; i < p; i++)
                 {
                     meanX[i] = (X.col(i).array() * wts.array().sqrt()).matrix().mean();
-                    //X.col(i).array() -= meanX[i]; 
+                    //X.col(i).array() -= meanX[i]; // Original oem
                     X.col(i).array() -= 0*meanX[i]; // EDIT (grplasso): centering on X is NOT performed when standardize = TRUE
                 }
                 break;
@@ -202,7 +204,7 @@ public:
                     // scaleX[i] = (X.col(i).array() * wts.array()).matrix().norm() * n_invsqrt;
                     // std::transform(begin, end, begin, std::bind2nd(std::multiplies<double>(), 1.0 / scaleX[i]));
                     meanX[i] = X.col(i).mean();
-                    //X.col(i).array() -= meanX[i]; 
+                    //X.col(i).array() -= meanX[i]; // Original oem
                     X.col(i).array() -= 0*meanX[i]; // EDIT (grplasso): centering on X is NOT performed when standardize = TRUE
                     scaleX[i] = X.col(i).norm() * n_invsqrt;
                     X.col(i).array() /= scaleX[i];
@@ -231,7 +233,7 @@ public:
                     for(int i = 0; i < p; i++)
                     {
                         meanX[i] = X.col(i).mean();
-                        //X.col(i).array() -= meanX[i]; 
+                        //X.col(i).array() -= meanX[i]; // Original oem
                         X.col(i).array() -= 0*meanX[i]; // EDIT (grplasso): centering on X is NOT performed when standardize = TRUE
                     }
                     break;
@@ -265,7 +267,7 @@ public:
                         // }
                         // std::transform(begin, end, begin, std::bind2nd(std::multiplies<double>(), 1.0 / scaleX[i]));
                         meanX[i] = X.col(i).mean();
-                        //X.col(i).array() -= meanX[i]; 
+                        //X.col(i).array() -= meanX[i]; // Original oem
                         X.col(i).array() -= 0*meanX[i]; // EDIT (grplasso): centering on X is NOT performed when standardize = TRUE
                         scaleX[i] = X.col(i).norm() * n_invsqrt;
                         if (scaleX[i] == 0.0)
@@ -292,15 +294,15 @@ public:
             case 1:
                 beta0 = 0;
                 coef /= scaleX;
-                coef *= scaleY; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+                coef *= scaleY; // EDIT: Since scaleY = 1 in edited code, this should be fine. Case 1 is what we want to change behaviour of anyways.
                 break;
             case 2:
-                coef *= scaleY; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+                coef *= scaleY; 
                 beta0 = meanY - (coef * meanX).sum();
                 break;
             case 3:
                 coef /= scaleX;
-                coef *= scaleY; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+                coef *= scaleY; 
                 beta0 = meanY - (coef * meanX).sum();
                 break;
             default:
@@ -318,15 +320,15 @@ public:
             case 1:
                 beta0 = 0;
                 elementwise_quot(coef, scaleX);
-                coef *= scaleY; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+                coef *= scaleY;  // EDIT: Since scaleY = 1 in edited code, this should be fine. Case 1 is what we want to change behaviour of anyways.
                 break;
             case 2:
-                coef *= scaleY; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+                coef *= scaleY; 
                 beta0 = meanY - sparse_inner_product(coef, meanX);
                 break;
             case 3:
                 elementwise_quot(coef, scaleX);
-                coef *= scaleY; // EDIT (grplasso): no centering/scaling of Y; centering on X is NOT performed when standardize = TRUE
+                coef *= scaleY; 
                 beta0 = meanY - sparse_inner_product(coef, meanX);
                 break;
             default:
